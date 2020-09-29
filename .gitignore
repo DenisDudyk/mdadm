@@ -1,1 +1,4 @@
 /.vagrant/
+/packer/.vagrant/
+/packer/*.box
+/packer/packer_cache/
