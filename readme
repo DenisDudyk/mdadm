@@ -1,0 +1,60 @@
+В файле raid.sh, который подключается в Vagrantfile
+
+1 Создается RAID10
+1.1 Сразу резервируется запасной диск
+1.2 Создается и сохраняется конфиг RAID /etc/mdadm/mdadm.conf
+
+2 Создается GPT раздел и 5 партиций
+2.1 Для разделов создается файловая система ext4
+2.2 Создаем каталоги и монтируем разделы
+2.3 !!!Монтирование в fstab добавлять не стал,  так как в домашке это не требовалось
+
+3 Ломаем RAID
+3.1 RAID автоматом чинится, берет запасной диск, который был предусмотрен при его создании 
+3.2 Извлекается поврежденый диск
+3.3 Добавляем новый запасной диск
+
+Итог
+
+df -h
+/dev/md127p1                      91M  1.6M   83M   2% /mnt/raid/part1
+/dev/md127p2                      92M  1.6M   84M   2% /mnt/raid/part2
+/dev/md127p3                      93M  1.6M   85M   2% /mnt/raid/part3
+/dev/md127p4                      92M  1.6M   84M   2% /mnt/raid/part4
+/dev/md127p5                      91M  1.6M   83M   2% /mnt/raid/part5
+
+
+sudo mdadm --detail /dev/md/raid10
+/dev/md/raid10:
+           Version : 1.2
+     Creation Time : Tue Sep 29 20:06:38 2020
+        Raid Level : raid10
+        Array Size : 507904 (496.00 MiB 520.09 MB)
+     Used Dev Size : 253952 (248.00 MiB 260.05 MB)
+      Raid Devices : 4
+     Total Devices : 5
+       Persistence : Superblock is persistent
+
+       Update Time : Tue Sep 29 20:07:14 2020
+             State : clean 
+    Active Devices : 4
+   Working Devices : 5
+    Failed Devices : 0
+     Spare Devices : 1
+
+            Layout : near=2
+        Chunk Size : 512K
+
+Consistency Policy : resync
+
+              Name : mdadm-comand:raid10  (local to host mdadm-comand)
+              UUID : 52358949:dd6a8a96:dd10581e:6da35794
+            Events : 32
+
+    Number   Major   Minor   RaidDevice State
+       5       8       96        0      active sync set-A   /dev/sdg
+       1       8       32        1      active sync set-B   /dev/sdc
+       2       8       48        2      active sync set-A   /dev/sdd
+       3       8       64        3      active sync set-B   /dev/sde
+
+       4       8       80        -      spare   /dev/sdf
